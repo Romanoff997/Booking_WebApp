@@ -1,0 +1,96 @@
+﻿@model FrontViewModel
+@{
+    ViewData["Title"] = "Массовое бронирование";
+}
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+
+<h2>Демостраница работы с API</h2>
+
+    <div>
+        <label for="Count">Бронирование 20 потокв</label>
+        @*< input id="Count" name="Count" value="@Model.Count"/> *@
+        @* <span asp-validation-for="Count" class="text-danger"></span> *@
+    </div>
+    <button type="button" id="RunBooking">Run!</button>
+<div>
+    <label id="RunMessage"></label>
+</div>
+
+    <div>
+        <label for="Numbers">Отмена потоков:</label>
+        <input id="Numbers" name="Numbers" value="@Model.Numbers" />
+    </div>
+    <button type="button" id="CancelBooking">Cancel!</button>
+
+    <div>
+        <label for="Statistic">Получить статистику работы</label>
+    </div>
+<button type="button" id="StatisticBooking">Получить статистику</button>
+
+
+<div>
+    <label id="SystemMessage"></label>
+</div>
+
+
+@section scripts {
+    <script>
+
+        $(function () {
+
+            $(document).on('click', "#RunBooking", function () {
+                var token = "@Xsrf.GetAndStoreTokens(Context).RequestToken";
+                $('#RunMessage').text("Запуск сделан!")
+                $.ajax({
+                    url: '@Url.Action("RunBooking", "Home")',
+                    type: 'GET',
+                    headers: {
+                        "RequestVerificationToken": token
+                    },
+                    success: function (result) {
+                         $('#RunMessage').text(result)
+                    },
+                    error: function (xhr, status, error) {
+                    }
+                });
+            });
+
+            $(document).on('click', "#CancelBooking", function () {
+                var token = "@Xsrf.GetAndStoreTokens(Context).RequestToken";
+                $.ajax({
+                    url: '@Url.Action("CancelBooking", "Home")',
+                    type: 'POST',
+                    data: {
+                        Numbers: $('#Numbers').val()
+                    },
+
+                    headers: {
+                        "RequestVerificationToken": token
+                    },
+                    success: function (result) {
+                         $('#SystemMessage').text(result)
+                    },
+                    error: function (xhr, status, error) {
+                    }
+                });
+            });
+
+            $(document).on('click', "#StatisticBooking", function () {
+                var token = "@Xsrf.GetAndStoreTokens(Context).RequestToken";
+                $.ajax({
+                    url: '@Url.Action("StatisticBooking", "Home")',
+                    type: 'Get',
+                    headers: {
+                        "RequestVerificationToken": token
+                    },
+                    success: function (result) {
+                         $('#SystemMessage').text(result)
+                    },
+                    error: function (xhr, status, error) {
+                    }
+                });
+            });
+
+        });
+    </script>
+}
